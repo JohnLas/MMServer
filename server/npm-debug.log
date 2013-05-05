@@ -1,0 +1,63 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'buffer' ]
+2 info using npm@1.2.18
+3 info using node@v0.10.4
+4 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\package.json
+5 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\node_modules\querystring\package.json
+6 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\node_modules\request\package.json
+7 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\node_modules\socket.io\package.json
+8 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\node_modules\users.js\package.json
+9 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\node_modules\ws\package.json
+10 verbose read json C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master\package.json
+11 verbose cache add [ 'buffer', null ]
+12 verbose cache add name=undefined spec="buffer" args=["buffer",null]
+13 verbose parsed url { protocol: null,
+13 verbose parsed url   slashes: null,
+13 verbose parsed url   auth: null,
+13 verbose parsed url   host: null,
+13 verbose parsed url   port: null,
+13 verbose parsed url   hostname: null,
+13 verbose parsed url   hash: null,
+13 verbose parsed url   search: null,
+13 verbose parsed url   query: null,
+13 verbose parsed url   pathname: 'buffer',
+13 verbose parsed url   path: 'buffer',
+13 verbose parsed url   href: 'buffer' }
+14 silly lockFile e53c2ea1-buffer buffer
+15 verbose lock buffer C:\Users\Jonas\AppData\Roaming\npm-cache\e53c2ea1-buffer.lock
+16 silly lockFile e53c2ea1-buffer buffer
+17 silly lockFile e53c2ea1-buffer buffer
+18 verbose addNamed [ 'buffer', '' ]
+19 verbose addNamed [ null, '' ]
+20 silly lockFile 777de10c-buffer buffer@
+21 verbose lock buffer@ C:\Users\Jonas\AppData\Roaming\npm-cache\777de10c-buffer.lock
+22 silly addNameRange { name: 'buffer', range: '', hasData: false }
+23 verbose url raw buffer
+24 verbose url resolving [ 'https://registry.npmjs.org/', './buffer' ]
+25 verbose url resolved https://registry.npmjs.org/buffer
+26 info trying registry request attempt 1 at 16:51:49
+27 http GET https://registry.npmjs.org/buffer
+28 http 404 https://registry.npmjs.org/buffer
+29 silly registry.get cb [ 404,
+29 silly registry.get   { server: 'CouchDB/1.3.0 (Erlang OTP/R15B03)',
+29 silly registry.get     date: 'Wed, 01 May 2013 14:51:50 GMT',
+29 silly registry.get     'content-type': 'application/json',
+29 silly registry.get     'content-length': '52',
+29 silly registry.get     'cache-control': 'must-revalidate' } ]
+30 silly lockFile 777de10c-buffer buffer@
+31 silly lockFile 777de10c-buffer buffer@
+32 error 404 'buffer' is not in the npm registry.
+32 error 404 You should bug the author to publish it
+32 error 404
+32 error 404 Note that you can also install from a
+32 error 404 tarball, folder, or http url, or git url.
+33 error System Windows_NT 6.1.7601
+34 error command "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "buffer"
+35 error cwd C:\Program Files (x86)\EasyPHP-12.1\www\MegaMonster\server\master
+36 error node -v v0.10.4
+37 error npm -v 1.2.18
+38 error code E404
+39 verbose exit [ 1, true ]
