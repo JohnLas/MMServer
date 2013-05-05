@@ -28,7 +28,7 @@ class UsersController extends AppController {
                     'login' => $this->request->data['login'],
                     'idFacebook' => $this->request->data['idFacebook'],
                 );
-            //$this->User->save($newUser);
+            $this->User->save($newUser);
             $this->set('user', $newUser);
             }
         }
