@@ -51,7 +51,7 @@ if (message.action == 'connectUser') {
 
     if (!users.isUserConnected(message['idFacebook'])) {
 
-        var url = '/MegaMonster/users/connect/'+message['idFacebook']+'/.json';
+        var url = '/users/connect/'+message['idFacebook']+'/.json';
 
         var callback = function (response) {
         parsedResponse = JSON.parse(response);
@@ -99,7 +99,7 @@ if(message.action == 'createUser') {
     data = new Object();
     data.idFacebook = socket.user.idFacebook;
     data.login = message['login'];
-    url = '/MegaMonster/users/add.json';
+    url = '/users/add.json';
 
     postRequest.post(data,url,callback);
 }
