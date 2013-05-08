@@ -18,7 +18,7 @@ function savePosition() {
     data = new Object();
     data.X =  this.X;
     data.Y = this.Y;
-    var url = '/MegaMonster/users/setPosition/'+this.id+'.json';
+    var url = '/users/setPosition/'+this.id+'.json';
     var callback = function(response){};
     request.post(data,url,callback);
 }
