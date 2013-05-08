@@ -6,9 +6,11 @@ var request = require('request');
 var Buffer = require('buffer').Buffer;
 var infra = require('./infraProperties.js');
 
+
 exports.get = function (url,callback) {
+  console.log('http://'+infra.host+":"+infra.port+url);
   require('request').get({
-    uri: 'http://'+infra.host+url,
+    uri: 'http://'+infra.host+":"+infra.port+url,
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     //body:require('querystring').stringify()
     },function(err,res,body){
@@ -22,9 +24,10 @@ exports.get = function (url,callback) {
    });
 }
 
+
 exports.post = function (data,url,callback) {
 var post_domain = infra.host;  
-var post_port = 80;  
+var post_port = infra.port;  
 var post_path = url;  
   
 var post_data = querystring.stringify(data);  

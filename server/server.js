@@ -60,7 +60,6 @@ if (message.action == 'connectUser') {
         console.log(response);
         socket.send(response);
         };
-
         postRequest.get(url,callback);
 
     } else {
