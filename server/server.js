@@ -71,11 +71,12 @@ if (message.action == 'connectUser') {
 
 
 //Perte de la connection
-socket.on('close', function() { 
-    if(users.isUserConnected(socket.user.id)) {
-        socket.user.savePosition();
-        users.deleteUser(socket.id);
-    }
+socket.on('close', function() {
+    if (socket.user) 
+        if(users.isUserConnected(socket.user.id)) {
+            socket.user.savePosition();
+            users.deleteUser(socket.id);
+        }
 });
 
 //Creation de compte
