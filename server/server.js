@@ -53,14 +53,18 @@ if (message.action == 'connectUser') {
 
         var url = '/users/connect/'+message['idFacebook']+'/.json';
 
-        var callback = function (response) {
-        parsedResponse = JSON.parse(response);
-        player = new user.create(parsedResponse.idFacebook, socket, parsedResponse.login, parsedResponse.X, parsedResponse.Y);                
-        users.addUser(player);
-        console.log(response);
-        socket.send(response);
+        var callback = function (response,userSocket) {
+            parsedResponse = JSON.parse(response);
+            player = new user.create(parsedResponse.idFacebook, userSocket, parsedResponse.login, parsedResponse.X, parsedResponse.Y,parsedResponse.map);                
+            users.addUser(player);
+
+            if(parsedResponse.action == 'connected') {
+                player.getPokemons(userSocket);
+            }
+
+            userSocket.send(response);
         };
-        postRequest.get(url,callback);
+        postRequest.get(url,callback,socket);
 
     } else {
         response = { };
@@ -71,25 +75,25 @@ if (message.action == 'connectUser') {
 
 
 //Perte de la connection
-socket.on('close', function() { 
-    if(users.isUserConnected(socket.user.id)) {
+socket.on('close', function() {
+    if(users.isUserConnected(socket.id)) {
         socket.user.savePosition();
-        users.deleteUser(socket.id);
+        users.deleteUser(socket.user);
     }
 });
 
 //Creation de compte
 if(message.action == 'createUser') {
-    var callback = function (response, statusCode) {
+    var callback = function (response, statusCode, userSocket) {
         console.log(response);
         if (statusCode == 200) {
-            socket.user.login = response.login;
+            userSocket.user.login = response.login;
             response = { };
             response.action = "profileCreated";
-            response.userId = socket.user.id;
-            response.login = socket.user.login;
+            response.userId = userSocket.user.id;
+            response.login = userSocket.user.login;
             
-            socket.send(JSON.stringify(response));
+            userSocket.send(JSON.stringify(response));
         } else {
             console.log(statusCode);
         }
@@ -100,7 +104,7 @@ if(message.action == 'createUser') {
     data.login = message['login'];
     url = '/users/add.json';
 
-    postRequest.post(data,url,callback);
+    postRequest.post(data,url,callback,socket);
 }
 
 
@@ -119,7 +123,12 @@ if(message.action == 'createUser') {
  }
  //Position des autres joueurs sur la map
  if(message.action == 'sendPosition') {
-    
+
+    if (message['map'] != socket.user.map) {
+        socket.user.map = message['map'];
+        socket.user.savePosition();
+    }
+
     socket.user.X = message['X'];
     socket.user.Y = message['Y'];
 
@@ -130,53 +139,85 @@ if(message.action == 'createUser') {
     response.Y = message['Y'];
 
     for (var i = 0; i < users.array.length; i++) {
-        users.array[i].socket.send(JSON.stringify(response));
-        console.log(JSON.stringify(response));
+        if(users.array[i].map == socket.user.map)
+            users.array[i].socket.send(JSON.stringify(response));
     }
 
+ }
+  //Changement de Map
+ if(message.action == 'changeMap') {
+    users.deleteUserFromMap(socket.user,message['oldMap']);
+    socket.user.X = message['X'];
+    socket.user.Y = message['Y'];
+    socket.user.map = message['newMap'];
+    users.notifyNewUser(socket.user);
  }
 
 
 
 /******************************************************************************
 *****                                                                     *****
-*****                           COMBATS                                   *****
+*****                       COMBATS PVP                                   *****
 *****                                                                     *****
 ******************************************************************************/
+// Request
+if(message.action == 'battleRequest') {
+    console.log(message);
+    room = new rooms.createRoom(socket.user,socket);
 
-            // Creation d'une salle
-            if(message.action == 'createRoom') {
-                rooms.createRoom(users.getUser(socket.id),socket);
-             }
-   
-            //rejoindre une salle
-             if(message.action == 'joinRoom') {
-                 try {
-                     rooms.getRoom(message['roomId']).join(users.getUser(socket.id),socket);
-                 } catch (e) {
-                     console.log(e);
-                     rooms.deleteRoom(message['roomId']);    
-                 }
-             }
-             
-             //choix du pokemon
-             if(message.action == 'choosePokemon') {
-                  users.getUser(socket.id).pokemon = new pokemon.create(message['pokemonId']);
-             }
+    responseOpp = new Object();
+    responseOpp.action = 'battleRequest';
+    responseOpp.id = socket.user.idFacebook;
+    responseOpp.login = socket.user.login;
+    responseOpp.roomId = room.id;
+    var opponent = users.getUserByFacebookId(message['idOpponent']);$
+    opponent.socket.send(JSON.stringify(response));
+}
+
+//Accept request
+if(message.action == 'acceptBattleRequest') {
+     try {
+         rooms.getRoom(message['roomId']).join(socket.user,socket);
+     } catch (e) {
+         console.log(e);
+         rooms.deleteRoom(message['roomId']);
+     }
+}
+
+
+// Creation d'une salle
+if(message.action == 'createRoom') {
+    rooms.createRoom(socket.user,socket);
+}
+
+//rejoindre une salle
+if(message.action == 'joinRoom') {
+     try {
+         rooms.getRoom(message['roomId']).join(users.getUser(socket.id),socket);
+     } catch (e) {
+         console.log(e);
+         rooms.deleteRoom(message['roomId']);
+     }
+}
  
-             //Lister les pokemons d'une room
-             if(message.action == 'getPokemons') {
-                  rooms.getRoom(message['roomId']).getPokemons(users.getUser(socket.id));
-             }
+ //choix du pokemon
+ if(message.action == 'newPokemon') {
+        new pokemon.create(message['pokemonId'],socket);
+ }
 
-             //Attaquer
-             if(message.action == 'attack') {
-                 rooms.getRoom(message['roomId']).addAttackToBuffer(users.getUser(socket.id), message['attackId']);
-             }
+ //Lister les pokemons d'une room
+ if(message.action == 'getPokemons') {
+      rooms.getRoom(message['roomId']).getPokemons(users.getUser(socket.id));
+ }
 
-             if (message.action == 'heal') {
-                 users.getUser(socket.id).pokemon = new pokemon.create(users.getUser(socket.id).pokemon.ID); 
-             }
+ //Attaquer
+ if(message.action == 'attack') {
+     rooms.getRoom(message['roomId']).addAttackToBuffer(users.getUser(socket.id), message['attackId']);
+ }
+
+ if (message.action == 'heal') {
+     users.getUser(socket.id).pokemon = new pokemon.create(users.getUser(socket.id).pokemon.ID); 
+ }
 
 
 

@@ -13,21 +13,35 @@ exports.countUsers = function() {
     return count;
 }
 
-exports.deleteUser = function (id) {  
+exports.deleteUser = function (user) {  
     for (var i = 0; i < this.array.length; i++) {
+      if (user.map == this.array[i].map) { 
+          try {
+              this.array[i].socket.send('{"action" : "deletePlayer", "userId" : "'+user.id+'"}'); 
+          } catch (e) {
+              console.log(e);
+          }
+      }
 
-        try {
-            this.array[i].socket.send('{"action" : "deletePlayer", "userId" : "'+id+'"}'); 
-        } catch (e) {
-            console.log(e);
-        }
-
-        if (this.array[i].id == id)
-           this.array.splice(i,1);
-
+    if (this.array[i].id == user.id)
+       this.array.splice(i,1);
     }
     console.log("Nb user connected : "+this.countUsers());
 }
+
+
+exports.deleteUserFromMap = function (user, map) {  
+    for (var i = 0; i < this.array.length; i++) {
+      if (map == this.array[i].map) {
+        try {
+            this.array[i].socket.send('{"action" : "deletePlayer", "userId" : "'+user.id+'"}'); 
+        } catch (e) {
+            console.log(e);
+        }
+      }
+    }
+}
+
 
 
 exports.getUser = function (id) {
@@ -46,18 +60,20 @@ exports.notifyNewUser = function(newUser) {
     console.log("newUser id :"+newUser.login);
     for (var i = 0; i < this.array.length; i++) {
 
-      if(this.array[i].id != newUser.id) {
+      if(this.array[i].id != newUser.id && this.array[i].map == newUser.map) {
         newUser.socket.send('{"action" : "newPlayer",'
                         +' "userId" : "'+this.array[i].id+'",'
                         +' "X" : "'+this.array[i].X+'",'
                         +' "Y" : "'+this.array[i].Y+'",'
-                        +' "login" : "'+this.array[i].login+'"}');
+                        +' "login" : "'+this.array[i].login+'",'
+                        +' "map" : "'+this.array[i].map+'"}');
 
         this.array[i].socket.send('{"action" : "newPlayer",'
                                   +' "userId" : "'+newUser.id+'",'
                                   +' "login" : "'+newUser.login+'",'
                                   +' "X" : "'+newUser.X+'",'
-                                  +' "Y" : "'+newUser.Y+'"}');
+                                  +' "Y" : "'+newUser.Y+'",'
+                                  +' "map" : "'+newUser.map+'"}');
 
        }
     }
@@ -66,8 +82,9 @@ exports.notifyNewUser = function(newUser) {
 exports.getUserByFacebookId = function(id) {
   index = -1;
   for (var i = 0; i < this.array.length; i++)
-      if (this.array[i].id == id)
+      if (this.array[i].id == id) {
           index = i;
+      }
   return this.array[index];
 }
 

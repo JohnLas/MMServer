@@ -49,12 +49,14 @@ class UsersController extends AppController {
             $response['idFacebook'] = $user['User']['idFacebook']; 
             $response['X'] = $user['User']['X'];
             $response['Y'] = $user['User']['Y'];
+            $response['map'] = $user['User']['map'];
         } else {
             $response['action'] = "create";
             $response['idFacebook'] = $id;
-            $response['login'] = "Unknown";
-            $response['X'] = 30;
-            $response['Y'] = 30;
+            $response['login'] = " ";
+            $response['X'] = 250;
+            $response['Y'] = 3200;
+            $response['map'] = "Town1";
         }
 
 

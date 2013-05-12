@@ -5,8 +5,7 @@ var rooms = {}
 function createRoom(user,socket) {
     newRoom = new room.create(id.makeId(),user);
     rooms[newRoom.id] = newRoom;
-    socket.send('{"action" : "roomHasBeenCreated", "roomId" : "'+newRoom.id+'"}');
-    console.log('roomHasBeenCreated');
+    return newRoom;
 }
 function deleteRoom(roomId) {
     delete rooms[roomId];

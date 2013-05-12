@@ -1,26 +1,17 @@
 ﻿var pokemonsTemplate = require('./pokemons');
 var skill            = require('./skill');
 var element    = require('./elements');
+var request = require('./postRequest.js');
 
-function create(id) {
-     this.ID        = pokemonsTemplate.pokemons[id].ID;
-     this.NAME      = pokemonsTemplate.pokemons[id].NAME;
-     this.PV        = pokemonsTemplate.pokemons[id].PV;  
-     this.PVInitial = pokemonsTemplate.pokemons[id].PV;
-     this.ATK       = pokemonsTemplate.pokemons[id].ATK;
-     this.DEF       = pokemonsTemplate.pokemons[id].DEF;
-     this.ASP       = pokemonsTemplate.pokemons[id].ASP;
-     this.DSP       = pokemonsTemplate.pokemons[id].DSP;
-     this.VIT       = pokemonsTemplate.pokemons[id].VIT;
-     this.TYPE      = pokemonsTemplate.pokemons[id].TYPE;
-     this.attack    = attack;
-     this.skills    = {};
-     this.skills[1] = new skill.create(pokemonsTemplate.pokemons[id].attack[1]);
-     this.skills[2] = new skill.create(pokemonsTemplate.pokemons[id].attack[2]);
-     this.skills[3] = new skill.create(pokemonsTemplate.pokemons[id].attack[3]);
-     this.skills[4] = new skill.create(pokemonsTemplate.pokemons[id].attack[4]);
-
-     return this;
+function create(id, socket) {
+    data = new Object();
+    data.idFacebook = socket.user.id;
+    data.idPokemon = id;
+    url = '/pokemons/create.json';
+    function callback(response, code, userSocket) {
+        userSocket.user.pokemons[1] = response;
+    }
+    request.post(data,url,callback,socket);
 }
 
 
