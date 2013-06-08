@@ -1,30 +1,29 @@
-﻿//var attackBuffer = [];
+﻿//var attackBuffer = ;
 
 
 function create(id,user){
     this.id = id;
     this.available = true;
     this.playerOne = user;
-    this.attackBuffer = [];
+    this.attackBuffer = {};
 
     //mthods
     this.addAttackToBuffer = addAttackToBuffer;
     this.startRound = startRound;
     this.playRound = playRound;
     this.getPokemons = getPokemons;
-    this.join = join;
+    this.joinRoom = joinRoom;
     return this;
 }
 
-function addAttackToBuffer(user,attackId) {
-    this.attackBuffer[user.id] = attackId;
+function addAttackToBuffer(user,attackid) {
+    this.attackBuffer[user.id] = attackid;
     var key, count = 0;
     for(key in this.attackBuffer) {
         if(this.attackBuffer.hasOwnProperty(key)) {
             count++;
         }
     }
-    console.log(user.id+'! '+this.attackBuffer+'! room: '+this.id);
     if(count == 2) {
         this.startRound();
         this.attackBuffer = [];
@@ -33,73 +32,67 @@ function addAttackToBuffer(user,attackId) {
 
 function startRound() {
     var starter, follower;
-    if(this.playerOne.pokemon.VIT >= this.playerTwo.pokemon.VIT) {
+    if(this.playerOne.currentPokemon.vit >= this.playerTwo.currentPokemon.vit) {
         starter = this.playerOne;
         follower = this.playerTwo;
     } else {
         starter = this.playerTwo;
         follower = this.playerOne;
     }
-
-    console.log(starter)
     this.playRound(starter,follower);
 }
 
 function playRound(starter, follower) {
-    var starterAtk  = starter.pokemon.attack(this, starter, this.attackBuffer[starter.id]);
-    var followerAtk = follower.pokemon.attack(this, follower, this.attackBuffer[follower.id]);
+    var starterAtk  = starter.currentPokemon.attack(this, starter, this.attackBuffer[starter.id]);
+    var followerAtk = follower.currentPokemon.attack(this, follower, this.attackBuffer[follower.id]);
     console.log("debug : "+starterAtk.name);
     console.log("dmg : "+starterAtk.damage);
-    starter.socket.send('{"action" : "round", "content" : {"1" : {"action" : "attack", "attackId" : "1", "attackLabel" : "'+starterAtk['name']+'", "damage" : "'+starterAtk.damage+'"}, "2" : {"action" : "attacked", "attackId" : "1","attackLabel" : "'+followerAtk['name']+'", "damage" : "'+followerAtk['damage']+'"}}}');
-    follower.socket.send('{"action" : "round", "content" : {"1" : {"action" : "attacked", "attacked" : "1", "attackLabel" : "'+starterAtk['name']+'", "damage" : "'+starterAtk['damage']+'"}, "2" : {"action" : "attack", "attackId" : "1", "attackLabel" : "'+followerAtk['name']+'", "damage" : "'+followerAtk['damage']+'"}}}');
+    starter.socket.send('{"action" : "round", "content" : {"1" : {"action" : "attack", "attackid" : "1", "attackLabel" : "'+starterAtk['name']+'", "damage" : "'+starterAtk.damage+'"}, "2" : {"action" : "attacked", "attackid" : "1","attackLabel" : "'+followerAtk['name']+'", "damage" : "'+followerAtk['damage']+'"}}}');
+    follower.socket.send('{"action" : "round", "content" : {"1" : {"action" : "attacked", "attacked" : "1", "attackLabel" : "'+starterAtk['name']+'", "damage" : "'+starterAtk['damage']+'"}, "2" : {"action" : "attack", "attackid" : "1", "attackLabel" : "'+followerAtk['name']+'", "damage" : "'+followerAtk['damage']+'"}}}');
 
     console.log("attaque");
 
 }
 
 function getPokemons(user) {
+    this.playerOne.currentPokemon = this.playerOne.pokemons[0];
+    this.playerTwo.currentPokemon = this.playerTwo.pokemons[0];
 
-console.log(this.playerOne.pokemon);
-console.log(this.playerTwo.pokemon);
-
-   if(this.playerOne.id == user.id)
+   if(this.playerOne.id == user.id) 
         user.socket.send('{"action" : "setPokemon",'
-                         +'"playerPokemonId"   : "'+this.playerOne.pokemon.ID+'",'
-                         +'"playerPokemonName" : "'+this.playerOne.pokemon.NAME+'",'
-                         +'"playerPokemonPV"   : "'+this.playerOne.pokemon.PV+'",'
-                         +'"ennemyPokemonId"   : "'+this.playerTwo.pokemon.ID+'",'
-                         +'"ennemyPokemonName" : "'+this.playerTwo.pokemon.NAME+'",'
-                         +'"ennemyPokemonPV"   : "'+this.playerTwo.pokemon.PV+'",'
-                         +'"atk1Label"         : "'+this.playerOne.pokemon.skills[1].name+'",'
-                         +'"atk2Label"         : "'+this.playerOne.pokemon.skills[2].name+'",'
-                         +'"atk3Label"         : "'+this.playerOne.pokemon.skills[3].name+'",'
-                         +'"atk4Label"         : "'+this.playerOne.pokemon.skills[4].name+'"'
+                         +'"playerPokemonId"   : "'+this.playerOne.pokemons[0].refId+'",'
+                         +'"playerPokemonName" : "'+this.playerOne.pokemons[0].name+'",'
+                         +'"playerPokemonPv"   : "'+this.playerOne.pokemons[0].life+'",'
+                         +'"ennemyPokemonId"   : "'+this.playerTwo.pokemons[0].refId+'",'
+                         +'"ennemyPokemonName" : "'+this.playerTwo.pokemons[0].name+'",'
+                         +'"ennemyPokemonPv"   : "'+this.playerTwo.pokemons[0].life+'",'
+                         +'"atk1Label"         : "'+this.playerOne.pokemons[0].skills[1].name+'",'
+                         +'"atk2Label"         : "'+this.playerOne.pokemons[0].skills[2].name+'",'
+                         +'"atk3Label"         : "'+this.playerOne.pokemons[0].skills[3].name+'",'
+                         +'"atk4Label"         : "'+this.playerOne.pokemons[0].skills[4].name+'"'
                          +'}');
    else
         user.socket.send('{"action" : "setPokemon",'
-                         +'"playerPokemonId"   : "'+this.playerTwo.pokemon.ID+'",'
-                         +'"playerPokemonName" : "'+this.playerTwo.pokemon.NAME+'",'
-                         +'"playerPokemonPV"   : "'+this.playerTwo.pokemon.PV+'",'
-                         +'"ennemyPokemonId"   : "'+this.playerOne.pokemon.ID+'",'
-                         +'"ennemyPokemonName" : "'+this.playerOne.pokemon.NAME+'",'
-                         +'"ennemyPokemonPV"   : "'+this.playerOne.pokemon.PV+'",'
-                         +'"atk1Label"         : "'+this.playerTwo.pokemon.skills[1].name+'",'
-                         +'"atk2Label"         : "'+this.playerTwo.pokemon.skills[2].name+'",'
-                         +'"atk3Label"         : "'+this.playerTwo.pokemon.skills[3].name+'",'
-                         +'"atk4Label"         : "'+this.playerTwo.pokemon.skills[4].name+'"'
+                         +'"playerPokemonId"   : "'+this.playerTwo.pokemons[0].refId+'",'
+                         +'"playerPokemonName" : "'+this.playerTwo.pokemons[0].name+'",'
+                         +'"playerPokemonPv"   : "'+this.playerTwo.pokemons[0].life+'",'
+                         +'"ennemyPokemonId"   : "'+this.playerOne.pokemons[0].refId+'",'
+                         +'"ennemyPokemonName" : "'+this.playerOne.pokemons[0].name+'",'
+                         +'"ennemyPokemonPv"   : "'+this.playerOne.pokemons[0].life+'",'
+                         +'"atk1Label"         : "'+this.playerTwo.pokemons[0].skills[1].name+'",'
+                         +'"atk2Label"         : "'+this.playerTwo.pokemons[0].skills[2].name+'",'
+                         +'"atk3Label"         : "'+this.playerTwo.pokemons[0].skills[3].name+'",'
+                         +'"atk4Label"         : "'+this.playerTwo.pokemons[0].skills[4].name+'"'
                          +'}');
 
 }
 
-function join( user, socket) {
+function joinRoom( user, socket) {
     if(this && this.available) {
         this.available = false;
         this.playerTwo = user;
-        this.playerOne.socket.send('{"action" : "gameStarted", "roomId" : "'+this.id+'"}');
-        this.playerTwo.socket.send('{"action" : "gameStarted", "roomId" : "'+this.id+'"}');
-
-        console.log(this.playerOne.id);
-        console.log(this.playerTwo.id);
+        this.playerOne.socket.send('{"action" : "gameStarted", "roomid" : "'+this.id+'"}');
+        this.playerTwo.socket.send('{"action" : "gameStarted", "roomid" : "'+this.id+'"}');
     }
 }
 

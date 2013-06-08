@@ -20,7 +20,16 @@ class PokemonsController extends AppController {
 
 
 	public function get($userId) {
-		$this->set('pokemons', $this->Pokemon->find('all', array('conditions' => array('userId' => $userId))));
+		$pkms = $this->Pokemon->find('all', array('conditions' => array('userId' => $userId)));
+		$pokemons = array();
+		foreach ($pkms as $pokemon) {
+			$pokemon['Pokemon']["attack1"] = "attack1";
+			$pokemon['Pokemon']["attack2"] = "attack2";
+			$pokemon['Pokemon']["attack3"] = "attack3";
+			$pokemon['Pokemon']["attack4"] = "attack4";
+			$pokemons[] = $pokemon;
+		}
+		$this->set('pokemons', $pokemons);
 	}
 
 }

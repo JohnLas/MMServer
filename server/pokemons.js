@@ -1,4 +1,7 @@
-﻿var pokemons = {
+﻿var pokemon = require('./pokemon');
+var skill = require('./skill');
+/*
+var pokemons = {
  1 : {ID : 1, NAME : 'Alakazam',    PV : 58, ATK : 64,  DEF: 58,  ASP: 80,  DSP: 65,  VIT : 80,  attack : {1:1, 2:2, 3:3 ,4:4 },  TYPE : 'psy'     },
  2 : {ID : 2, NAME : 'Arcanin',     PV : 90, ATK : 110, DEF: 80,  ASP: 100, DSP: 80,  VIT : 90,  attack : {1:5, 2:6, 3:7 ,4:8 },  TYPE : 'psy'     },
  3 : {ID : 3, NAME : 'Soporifik',   PV : 60, ATK : 48,  DEF: 45,  ASP: 43,  DSP: 90,  VIT : 42,  attack : {1:9, 2:10,3:11,4:12},  TYPE : 'psy'     },
@@ -16,8 +19,18 @@
 15 : {ID : 15,NAME : 'Ledian',      PV : 80, ATK : 82,  DEF: 78,  ASP: 95,  DSP: 80,  VIT : 85,  attack : {1:2, 2:3, 3:4, 4:5 },  TYPE : 'insecte' },
 16 : {ID : 16,NAME : 'Ninjask',     PV : 60, ATK : 80,  DEF: 110, ASP: 50,  DSP: 80,  VIT : 45,  attack : {1:6, 2:7, 3:8, 4:9 },  TYPE : 'insecte' },
 17 : {ID : 17,NAME : 'Ariados',     PV : 40, ATK : 45,  DEF: 120, ASP: 100, DSP: 120, VIT : 90,  attack : {1:10,2:11,3:12,4:13},  TYPE : 'insecte' },
+}
 
+function getUserPokemons (response) {
+    var i = 0;
+    var pokemons = [];
+    for(var attributename in response){
+        pokemons.push(new pokemon.create(response[attributename]));
+    }
+    return pokemons;
 }
 
 
-exports.pokemons = pokemons;
+exports.getUserPokemons = getUserPokemons;
+
+*/

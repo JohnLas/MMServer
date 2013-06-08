@@ -28,7 +28,7 @@ try {
              isMessageValid = false;
         }
         if (isMessageValid) {
-             //console.log(message.action);
+             console.log(message.action);
              
 
 /******************************************************************************
@@ -86,7 +86,6 @@ socket.on('close', function() {
 //Creation de compte
 if(message.action == 'createUser') {
     var callback = function (response, statusCode, userSocket) {
-        console.log(response);
         if (statusCode == 200) {
             userSocket.user.login = response.login;
             response = { };
@@ -143,11 +142,23 @@ if(message.action == 'createUser') {
         if(users.array[i].map == socket.user.map)
             users.array[i].socket.send(JSON.stringify(response));
     }
-
  }
+ 
   //Changement de Map
  if(message.action == 'changeMap') {
-    users.deleteUserFromMap(socket.user,message['oldMap']);
+    //users.deleteUserFromMap(socket.user,message['oldMap']);
+    response = { };
+    response.action = "goToWarp";
+    response.userId = socket.user.id;
+    response.X = message['oldX'];
+    response.Y = message['oldY'];
+
+    for (var i = 0; i < users.array.length; i++) {
+        if(users.array[i].map == message['oldMap'])
+            users.array[i].socket.send(JSON.stringify(response));
+    }
+
+
     socket.user.X = message['X'];
     socket.user.Y = message['Y'];
     socket.user.map = message['newMap'];
@@ -163,7 +174,7 @@ if(message.action == 'createUser') {
 ******************************************************************************/
 // Request
 if(message.action == 'battleRequest') {
-    console.log(message);
+    socket.user.savePosition();
     room = new rooms.createRoom(socket.user,socket);
 
     responseOpp = new Object();
@@ -171,17 +182,21 @@ if(message.action == 'battleRequest') {
     responseOpp.id = socket.user.idFacebook;
     responseOpp.login = socket.user.login;
     responseOpp.roomId = room.id;
-    var opponent = users.getUserByFacebookId(message['idOpponent']);$
-    opponent.socket.send(JSON.stringify(response));
+    socket.user.room = room.id;
+    var opponent = users.getUserByFacebookId(message['id']);
+    opponent.socket.send(JSON.stringify(responseOpp));
 }
 
 //Accept request
 if(message.action == 'acceptBattleRequest') {
+  socket.user.savePosition();
      try {
-         rooms.getRoom(message['roomId']).join(socket.user,socket);
+         socket.user.room = message['id'];
+         var room = rooms.getRoom(message['id']);
+         room.joinRoom(socket.user,socket);
      } catch (e) {
          console.log(e);
-         rooms.deleteRoom(message['roomId']);
+         rooms.deleteRoom(message['id']);
      }
 }
 
@@ -194,7 +209,7 @@ if(message.action == 'createRoom') {
 //rejoindre une salle
 if(message.action == 'joinRoom') {
      try {
-         rooms.getRoom(message['roomId']).join(users.getUser(socket.id),socket);
+         rooms.getRoom(socket.user.room).joinRoom(users.getUser(socket.id),socket);
      } catch (e) {
          console.log(e);
          rooms.deleteRoom(message['roomId']);
@@ -203,22 +218,22 @@ if(message.action == 'joinRoom') {
  
  //choix du pokemon
  if(message.action == 'newPokemon') {
-        new pokemon.create(message['pokemonId'],socket);
+        new pokemon.register(message['pokemonId'],socket);
  }
 
  //Lister les pokemons d'une room
  if(message.action == 'getPokemons') {
-      rooms.getRoom(message['roomId']).getPokemons(users.getUser(socket.id));
+      rooms.getRoom(socket.user.room).getPokemons(socket.user);
  }
 
  //Attaquer
  if(message.action == 'attack') {
-     rooms.getRoom(message['roomId']).addAttackToBuffer(users.getUser(socket.id), message['attackId']);
+     rooms.getRoom(socket.user.room).addAttackToBuffer(socket.user, message['attackId']);
  }
 
- if (message.action == 'heal') {
-     users.getUser(socket.id).pokemon = new pokemon.create(users.getUser(socket.id).pokemon.ID); 
- }
+/* if (message.action == 'heal') {
+     socket.user.pokemon = new pokemon.create(users.getUser(socket.id).pokemon.ID); 
+ }*/
 
 
 
